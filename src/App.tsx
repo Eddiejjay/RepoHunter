@@ -1,62 +1,40 @@
 import React, { useReducer } from 'react'
-import axios from 'axios'
-import { reducer, setReposByUser } from './state'
+// import axios from 'axios'
+import { reducer,  initialState } from './state'
 import { Context } from './state'
 import {
-  BrowserRouter as Router, Switch, Route
+    BrowserRouter as Router, Switch, Route
 } from "react-router-dom"
-import LandingPAge from './LandingPage'
-import ReposByUserPage from './ReposByUserPage'
-
-
-
-function App() {
-
-const initialState = { reposByUser: []}
-const [state, dispatch] = useReducer(reducer, initialState);
-const apiBaseUrl = ' https://api.github.com/'
-const repoUrl = 'https://api.github.com/users/Eddiejjay/repos'
+import Search from './components/Search'
+import ReposByUser from './components/ReposByUser'
+import Header from './components/Header'
 
 
 
 
-React.useEffect(() => {
+const App =() => {
 
-  const fetchData= async () => {
-    try {
-      const { data } = await axios.get(
-        `${repoUrl}`
+    const [state, dispatch] = useReducer(reducer, initialState);
+    return (
+        <div className ="bg-gray-100 flex flex-col h-4/5">
+            <Header/>
+            <div className ="flex flex-col "> 
+                <Context.Provider value = {[state, dispatch]}>
+                    <Router>
+                        <Search/>
+                        <Switch>
+                            <Route path ="/:user/repos"> 
+                                <ReposByUser></ReposByUser>
+                            </Route>
 
-      );
-      console.log('data', data)
-      dispatch(setReposByUser(data));
-    
-    } catch (e) {
-      console.error(e);
-    }
-  };
-  void fetchData();
- 
+                        </Switch>
 
-}, [dispatch])
+                    </Router>
+                </Context.Provider>
+            </div>
+        </div>
 
-
-
-
-  return (
-    <Context.Provider value = {[state, dispatch]}>
-    <Router>
-    <Switch>
-            <Route path ="/"> 
-            <LandingPAge ></LandingPAge>
-            <ReposByUserPage></ReposByUserPage>
-            </Route>
-          </Switch>
-
-    </Router>
-    </Context.Provider>
-
-  );
+    );
 }
 
 export default App;
