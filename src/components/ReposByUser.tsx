@@ -18,14 +18,22 @@ const ReposByUser = () => {
 
     useEffect(() => {
         const fetchReposByUser = async () => {
-            const { data } = await axios.get(
-
-                // eslint-disable-next-line @typescript-eslint/restrict-template-expressions
-                `${baseUrl}/users/${user}/repos`, { 'headers': { 'Authorization': `token ${TOKEN}` }});
-            dispatch(setReposByUser(data));
-        }
+            try {
+                const { data } = TOKEN 
+                    ? await axios.get(
+                        // eslint-disable-next-line @typescript-eslint/restrict-template-expressions
+                        `${baseUrl}/users/${user}/repos`, { 'headers': { 'Authorization': `token ${TOKEN}` }})
+                    :await axios.get(
+                        `${baseUrl}/users/${user}/repos`)
+                dispatch(setReposByUser(data));
+                console.log('dataa', data)
+            }catch(e){
+                console.error('error',e)
+                window.alert(e)
+            }}
         void fetchReposByUser()
     }
+    
     , [user, dispatch])
 
 
@@ -38,6 +46,8 @@ const ReposByUser = () => {
 
 
     return (
+
+
         <div className="flex flex-col container mx-auto " >
             <div className="-my-2 overflow-x-auto sm:-mx-6 lg:-mx-8">
                 <div className="py-2 align-middle inline-block min-w-full sm:px-6 lg:px-8">
