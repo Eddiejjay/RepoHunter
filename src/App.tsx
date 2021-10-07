@@ -6,15 +6,18 @@ import {
     BrowserRouter as Router, Switch, Route
 } from "react-router-dom"
 import Search from './components/Search'
-import ReposByUser from './components/ReposByUser'
+import Repos from './components/Repos'
 import Header from './components/Header'
-
+import Error from './components/Error'
+import Toggle from './components/Toggle'
 
 
 
 const App =() => {
 
     const [state, dispatch] = useReducer(reducer, initialState);
+    
+
     return (
         <div className ="bg-gray-100 flex flex-col h-4/5">
             <Header/>
@@ -22,13 +25,13 @@ const App =() => {
                 <Context.Provider value = {[state, dispatch]}>
                     <Router>
                         <Search/>
+                        {state.errorMessage !== '' && <Error/>}
+                        <Toggle/>
                         <Switch>
                             <Route path ="/:user/repos"> 
-                                <ReposByUser></ReposByUser>
+                                <Repos></Repos>
                             </Route>
-
                         </Switch>
-
                     </Router>
                 </Context.Provider>
             </div>

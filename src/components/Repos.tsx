@@ -1,53 +1,36 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
+/* eslint-disable @typescript-eslint/restrict-template-expressions */
 /* eslint-disable @typescript-eslint/no-unsafe-assignment */
 import React, { useEffect, useContext } from 'react'
+import axios from 'axios'
+import LinkIcon from './LinkIcon';
 import { useParams } from 'react-router';
 import { baseUrl } from '../constants';
-import {  setReposByUser} from '../state'
-import axios from 'axios'
-import { Context } from '../state'
+import {  setReposByUser, Context, setErrorMessage  } from '../state'
 
 
-
-
-
-const ReposByUser = () => {
+const Repos = () => {
     const { user } = useParams<{ user: string }>();
-    const [{reposByUser}, dispatch] = useContext(Context);
+    const [{reposByUser, enabled}, dispatch] = useContext(Context);
     const TOKEN:string|undefined= process.env.REACT_APP_TOKEN
-    console.log('token', TOKEN)
+    const url = !enabled ?  `${baseUrl}/users/${user}/repos?per_page=100&type=owner` : `${baseUrl}/orgs/${user}/repos?per_page=100&type=owner`
+    const axiosGetWithToken = async () => await axios.get(url, { 'headers': { 'Authorization': `token ${TOKEN}` }})
+    const axiosGetWithoutToken = async () => await axios.get(url)
 
     useEffect(() => {
         const fetchReposByUser = async () => {
             try {
-                const { data } = TOKEN 
-                    ? await axios.get(
-                        // eslint-disable-next-line @typescript-eslint/restrict-template-expressions
-                        `${baseUrl}/users/${user}/repos`, { 'headers': { 'Authorization': `token ${TOKEN}` }})
-                    :await axios.get(
-                        `${baseUrl}/users/${user}/repos`)
+                const { data }   = TOKEN ? await axiosGetWithToken() : await axiosGetWithoutToken()
                 dispatch(setReposByUser(data));
-                console.log('dataa', data)
-            }catch(e){
-                console.error('error',e)
-                window.alert(e)
+            }catch(e:any){
+                console.error(e)
+                dispatch(setErrorMessage(e.message))
             }}
         void fetchReposByUser()
     }
-    
-    , [user, dispatch])
-
-
-    const linkIcon = () => {
-        return (
-            <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13.828 10.172a4 4 0 00-5.656 0l-4 4a4 4 0 105.656 5.656l1.102-1.101m-.758-4.899a4 4 0 005.656 0l4-4a4 4 0 00-5.656-5.656l-1.1 1.1" />
-            </svg>
-        )}
-
+    , [user, dispatch, enabled])
 
     return (
-
-
         <div className="flex flex-col container mx-auto " >
             <div className="-my-2 overflow-x-auto sm:-mx-6 lg:-mx-8">
                 <div className="py-2 align-middle inline-block min-w-full sm:px-6 lg:px-8">
@@ -59,7 +42,7 @@ const ReposByUser = () => {
                                         scope="col"
                                         className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider flex gap-3"
                                     >
-                                        {linkIcon()} Name 
+                                        <LinkIcon/> Name 
                                     </th>
                                     <th
                                         scope="col"
@@ -102,6 +85,6 @@ const ReposByUser = () => {
     )
 }
 
-export default ReposByUser
+export default Repos
 
 

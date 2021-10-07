@@ -1,19 +1,22 @@
-import React, { useState } from 'react'
+import React, { useContext, useState } from 'react'
 import {
     useHistory
 } from "react-router-dom"
+import { Context, setErrorMessage } from '../state'
 
 const Search = () => {
     const [searchField, setSerachField] = useState('')
     const history = useHistory()
-
+    const [ , dispatch] = useContext(Context);
 
     const handleSearchClick = () => {
+        dispatch(setErrorMessage(''))
         if(!searchField) {
-            window.alert("You need to type search text")
+            dispatch(setErrorMessage('Please type search text to continue!'))
         } else {
             history.push(`/${searchField}/repos`)
         }}
+
     const handleKeypress = (event: { key: string }) => {
         if (event.key === 'Enter') {
             void handleSearchClick()
@@ -32,6 +35,7 @@ const Search = () => {
             <input onChange = {(e) => setSerachField(e.target.value)} onKeyPress={handleKeypress} className="bg-gray-200 h-10 w-1/4 hover:bg-blue-100 rounded-lg"placeholder ="Search repositories by username"/>
             <button className="px-1 h-8 rounded-lg bg-gray-800 text-white hover:bg-blue-100 hover:text-black border-double border-pink-900"onClick = {handleSearchClick}>Search</button>
         </div>
+  
     )
 }
 
